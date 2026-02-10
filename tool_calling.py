@@ -53,12 +53,12 @@ def chat(message, history):
     messages = [{"role": "system", "content": system_message}] + history + [{"role": "user", "content": message}]
     response = openai.chat.completions.create(model=MODEL, messages=messages, tools=tools)
 
-    if response.choices[0].finish_reason == "tool_calls":
+    while response.choices[0].finish_reason == "tool_calls":
         message = response.choices[0].message
         response = handle_tool_calls(message)
         messages.append(message)
         messages.append(response)
-        response = openai.chat.completions.create(model=MODEL, messages=messages)
+        response = openai.chat.completions.create(model=MODEL, messages=messages, tools=tools)
     
     return response.choices[0].message.content
 
